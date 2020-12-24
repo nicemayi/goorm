@@ -13,7 +13,7 @@ type Session struct {
 }
 
 func New(db *sql.DB) *Session {
-	return &Session{db:db}
+	return &Session{db: db}
 }
 
 func (s *Session) Clear() {
