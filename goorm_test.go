@@ -3,6 +3,7 @@ package goorm
 import (
 	"errors"
 	"goorm/session"
+	"reflect"
 	"testing"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -39,6 +40,22 @@ func transactionRollback(t *testing.T) {
 	})
 	if err == nil || s.HasTable() {
 		t.Fatal("failed to rollback")
+	}
+}
+
+func TestEngine_Migrate(t *testing.T) {
+	engine := OpenDB(t)
+	defer engine.Close()
+	s := engine.NewSession()
+	_, _ = s.Raw("DROP TABLE IF EXISTS User;").Exec()
+	_, _ = s.Raw("CREATE TABLE User(Name text PRIMARY KEY, XXX integer);").Exec()
+	_, _ = s.Raw("INSERT INTO User(`Name`) values (?), (?)", "Tom", "Sam").Exec()
+	engine.Migrate(&User{})
+
+	rows, _ := s.Raw("SELECT * FROM User").QueryRows()
+	columns, _ := rows.Columns()
+	if !reflect.DeepEqual(columns, []string{"Name", "Age"}) {
+		t.Fatal("Failed to migrate table User, got columns", columns)
 	}
 }
 
