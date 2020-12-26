@@ -2,7 +2,7 @@ package goorm
 
 import (
 	"errors"
-	"geeorm/session"
+	"goorm/session"
 	"testing"
 
 	_ "github.com/mattn/go-sqlite3"
